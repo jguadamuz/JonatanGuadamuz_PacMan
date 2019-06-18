@@ -10,12 +10,17 @@
     <style>
         body {
             background-color: black;
+            margin: 0px;
+        }
+
+        div.row {
+            height: 20px;
         }
 
         div.row div {
             width: 20px;
             height: 20px;
-            border: 1px solid black;
+            /* border: 1px solid black; */
             display: inline-block;
         }
 
@@ -29,76 +34,184 @@
             background-position: center;
         }
 
-        div.pacman {
+        div#pacman {
             background-image: url('pacman.gif');
             background-repeat: no-repeat;
             background-position: center;
+            background-size: contain;
+            width: 20px;
+            height: 20px;
+            position: absolute;
+        }
+
+        div#score {
+            border: 1px solid white;
+            width: 30px;
+            height: 20px;
+            color: white;
+            padding: 7px;
+            text-align: center;
+            position: absolute;
+            top: 10px;
+            /* left: 210px; */
+        }
+
+        div.cherry {
+            background-image: url('cherry.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            width: 20px;
+            height: 20px;
         }
     </style>
 </head>
 
-<body>
-    <div class="row">
-        <div class="brick"></div>
-        <div class="brick"></div>
-        <div class="brick"></div>
-        <div class="brick"></div>
-        <div class="brick"></div>
-        <div class="brick"></div>
-        <div class="brick"></div>
-        <div class="brick"></div>
-        <div class="brick"></div>
-        <div class="brick"></div>
-    </div>
-    <div class="row">
-        <div class="brick"></div>
-        <div class="coin"></div>
-        <div class="coin"></div>
-        <div class="coin"></div>
-        <div class="coin"></div>
-        <div class="coin"></div>
-        <div class="coin"></div>
-        <div class="coin"></div>
-        <div class="coin"></div>
-        <div class="brick"></div>
-    </div>
-    <div class="row">
-        <div class="brick"></div>
-        <div class="coin"></div>
-        <div class="coin"></div>
-        <div class="coin"></div>
-        <div class="coin"></div>
-        <div class="coin"></div>
-        <div class="coin"></div>
-        <div class="coin"></div>
-        <div class="coin"></div>
-        <div class="brick"></div>
-    </div>
-    <div class="row">
-        <div class="brick"></div>
-        <div class="coin"></div>
-        <div class="coin"></div>
-        <div class="coin"></div>
-        <div class="coin"></div>
-        <div class="coin"></div>
-        <div class="coin"></div>
-        <div class="coin"></div>
-        <div class="coin"></div>
-        <div class="brick"></div>
-    </div>
-    <div class="row">
-        <div class="brick"></div>
-        <div class="brick"></div>
-        <div class="brick"></div>
-        <div class="brick"></div>
-        <div class="brick"></div>
-        <div class="brick"></div>
-        <div class="brick"></div>
-        <div class="brick"></div>
-        <div class="brick"></div>
-        <div class="brick"></div>
-    </div>
 
+<body>
+    <div id="world"></div>
+    <div id="pacman"></div>
+    <div id="score">0</div>
+    <script>
+        /* TODO: Prevent PacMan from leaving the maze or going through the walls.
+        */
+        // TODO: Change the world map and make the maze more interesting!
+        // TODO: Get cherries to appear. Cherry = 50 pts.
+        /* TODO: Get PacMan to lookup up/down/left/right depending
+           on the direction PacMan is moving.
+        */
+        /* TODO: (Optional) Get a ghost to show up (the ghost does not have to move yet).
+           When PacMan meets the ghost, have PacMan lose its life.
+        */
+        // TODO: (Optional) Get the ghost to move around in random directions.
+        /* TODO: (Optional) Get two PacMans to show up and move! (use one keyboard 
+           to move 2 PacMans)
+        */
+        const WORLD_SIZE = 20;
+        var world = [];
+        /*         var world = [
+                    [2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+                    [2, 1, 2, 1, 1, 1, 1, 1, 1, 1],
+                    [2, 1, 2, 1, 2, 2, 2, 1, 1, 2],
+                    [1, 1, 2, 1, 2, 1, 2, 1, 1, 2],
+                    [2, 1, 2, 1, 2, 1, 2, 1, 1, 2],
+                    [2, 1, 2, 2, 2, 1, 2, 1, 1, 2],
+                    [2, 1, 1, 1, 1, 1, 2, 1, 1, 2],
+                    [2, 1, 1, 1, 1, 1, 1, 1, 1, 2],
+                    [2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+                ]; */
+
+        var score = 0;
+        var pacman = {
+            x: 1,
+            y: 1,
+            try: {
+                x: 0,
+                y: 0
+            }
+        }
+
+        function createWorld() {
+            for (var y = 0; y < WORLD_SIZE; y++) {
+                world.push([]);
+                for (var x = 0; x < WORLD_SIZE; x++) {
+                    world[y].push(Math.floor(Math.random() * 4));
+                }
+            }
+        }
+        createWorld();
+
+        function displayWorld() {
+            var output = "";
+
+            world.forEach(row => {
+                output += "\n<div class='row'>\n";
+                row.forEach(cell => {
+                    if (cell === 2) {
+                        output += "<div class='brick'></div>";
+                    }
+                    if (cell === 1) {
+                        output += "<div class='coin'></div>";
+                    }
+                    if (cell === 0) {
+                        output += "<div class='empty'></div>";
+                    }
+                    if (cell === 3) {
+                        output += "<div class='cherry'></div>";
+                    }
+                });
+                output += "\n</div>"
+            });
+            // console.log(output);
+            document.querySelector("#world").innerHTML = output;
+        }
+
+        function displayPacman() {
+            document.querySelector("#pacman").style.left = pacman.x * 20 + "px";
+            document.querySelector("#pacman").style.top = pacman.y * 20 + "px";
+        }
+        displayWorld();
+        displayPacman();
+        
+        function displayScore() {
+            document.querySelector("#score").innerHTML = score;
+            document.querySelector("div#score").style.left =  (WORLD_SIZE * 20 + 10) + "px";
+        }
+        displayScore();
+
+        function isValidPath(x, y) {
+            if (x > world.length || y > world.length || x < 0 || y < 0) {
+                console.log(`it would be out of the maze at ${x},${y}`);
+                return false;
+            }
+            if (world[y][x] == 2) { // bricks
+                console.log(`it was a brick at ${x},${y}`);
+                return false;
+            }
+            return true;
+        }
+
+        function eatCoins() {
+            if (world[pacman.y][pacman.x] == 1) { // coins
+                world[pacman.y][pacman.x] = 0; // coins deleted
+                score += 10;
+                displayWorld();
+                displayScore();
+            }
+        }
+        eatCoins();
+
+        function eatCherries() {
+            if (world[pacman.y][pacman.x] == 3) { // cherries
+                world[pacman.y][pacman.x] = 0; // cherry deleted
+                score += 50;
+                displayWorld();
+                displayScore();
+            }
+        }
+        eatCherries();
+
+        document.onkeydown = function (e) {
+            console.log(e);
+            if (e.key === "ArrowRight" && isValidPath(pacman.x + 1, pacman.y)) {
+                pacman.x++;
+            }
+            if (e.key === "ArrowLeft" && isValidPath(pacman.x - 1, pacman.y)) {
+                pacman.x--;
+            }
+            if (e.key === "ArrowUp" && isValidPath(pacman.x, pacman.y - 1)) {
+                pacman.y--;
+            }
+            if (e.key === "ArrowDown" && isValidPath(pacman.x, pacman.y + 1)) {
+                pacman.y++;
+            }
+            // console.log(pacman);
+            eatCoins();
+            eatCherries();
+            displayPacman();
+        }
+
+    </script>
 </body>
 
 </html>
